@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 
 import jetson.inference
 import jetson.utils
