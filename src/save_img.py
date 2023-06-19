@@ -5,7 +5,7 @@ import jetson.utils
 
 import argparse
 import sys
-import keyboard
+import cv2
 import time
 
 # parse the command line
@@ -27,6 +27,7 @@ except:
 # create video sources & outputs
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
 output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
+        
 
 # process frames until the user exits
 while True:
@@ -36,7 +37,7 @@ while True:
     # render the image
     output.Render(img)
 
-    if keyboard.is_pressed("c"):
+    if cv2.waitKey(1) == ord("c"):
         jetson.utils.saveImageRGBA("img" + time.time() + ".jpg", img)
         print("saved an image!")
 
