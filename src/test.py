@@ -26,8 +26,62 @@ import jetson.utils
 
 import argparse
 import sys
+import math
 
-x = False
+break_ = False
+
+frame_index = 0
+
+thumb1_x = 0
+thumb1_y = 0
+index1_x = 0
+index1_y = 0
+index3_x = 0
+index3_y = 0
+index4_x = 0
+index4_y = 0
+baby1_x = 0
+baby1_y = 0 
+
+ref_distance = 0
+thumb_index_distance = 0
+baby_index_distance = 0
+baby_thumb_distance = 0
+
+prev_Gesture = 0
+stroke = 0
+handUp = False
+
+def CalculateDistance(point1_x, point1_y, point2_x, point2_y):
+  return round(math.sqrt((abs(point1_x-point2_x)**2)+(abs(point1_y-point2_y)**2)),2)
+
+def GetGesture():
+
+  gesture = 0    #0-none  1-rock   2-paper   3-scrissors
+
+  ref_distance = CalculateDistance(index3_x, index3_y, index4_x, index4_y)
+  thumb_index_distance = CalculateDistance(thumb1_x, thumb1_y, index1_x, index1_y)
+  baby_index_distance = CalculateDistance(baby1_x, baby1_y, index1_x, index1_y)
+  baby_thumb_distance = CalculateDistance(baby1_x, baby1_y, thumb1_x, thumb1_y)
+
+  if len(poses) == 0:
+    gesture = 0
+  elif baby_index_distance < 3*ref_distance:
+    gesture = 1
+  elif thumb_index_distance > 2*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance > 3*ref_distance:
+    gesture = 2
+  elif thumb_index_distance > 2*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance < 3*ref_distance:
+    gesture = 3
+  else:
+    gesture = 0
+
+  return gesture
+
+def PrintValues():
+  print(ref_distance)
+  print(thumb_index_distance)
+  print(baby_index_distance)
+  print(baby_thumb_distance)
 
 # parse the command line
 parser = argparse.ArgumentParser(description="Run pose estimation DNN on a video/image stream.", 
@@ -36,7 +90,7 @@ parser = argparse.ArgumentParser(description="Run pose estimation DNN on a video
 
 parser.add_argument("input_URI", type=str, default="", nargs='?', help="URI of the input stream")
 parser.add_argument("output_URI", type=str, default="", nargs='?', help="URI of the output stream")
-parser.add_argument("--network", type=str, default="resnet18-hand", help="pre-trained model to load (see below for options)")
+parser.add_argument("--network", type=str, default="empty", help="pre-trained model to load (see below for options)")
 parser.add_argument("--overlay", type=str, default="links,keypoints", help="pose overlay flags (e.g. --overlay=links,keypoints)\nvalid combinations are:  'links', 'keypoints', 'boxes', 'none'")
 parser.add_argument("--threshold", type=float, default=0.15, help="minimum detection threshold to use") 
 
@@ -66,16 +120,41 @@ while True:
     print("detected {:d} objects in image".format(len(poses)))
 
     for pose in poses:
-        print(pose)
-        print(pose.Keypoints)
-        print('Links', pose.Links)
-
-          #for keypoint in pose.Keypoints:
-            #if keypoint.ID == 9 and keypoint.y < 300:
-            #    x = True
-            #if keypoint.ID == 10 and keypoint.y > 500 and x == True:
-            #    print("OK")
-
+        for keypoint in pose.Keypoints:
+            if keypoint.ID == 0 and keypoint.y < (img.height/2)-50 and handUp == False and not GetGesture() == 0:
+              handUp = True
+            if keypoint.ID == 0 and keypoint.y > (img.height/2)+50 and handUp == True and not GetGesture() == 0:
+              handUp = False
+              stroke = stroke+1
+            if keypoint.ID == 1:
+              thumb1_x = keypoint.x
+              thumb1_y = keypoint.y
+            if keypoint.ID == 5:
+              index1_x = keypoint.x
+              index1_y = keypoint.y
+            if keypoint.ID == 7:
+              index3_x = keypoint.x
+              index3_y = keypoint.y
+            if keypoint.ID == 8:
+              index4_x = keypoint.x
+              index4_y = keypoint.y
+            if keypoint.ID == 17:
+              baby1_x = keypoint.x
+              baby1_y = keypoint.y
+        if stroke == 3:
+          print(GetGesture())
+          break_ = False
+        if stroke > 3:
+          stroke = 0
+    if frame_index < 25:
+      if prev_Gesture == GetGesture():
+        frame_index = frame_index+1
+        prev_Gesture = GetGesture()
+      else:
+        frame_index = 0
+    else:
+      print(prev_Gesture)
+      break_ = True
 
     # render the image
     output.Render(img)
@@ -87,5 +166,5 @@ while True:
     net.PrintProfilerTimes()
 
     # exit on input/output EOS
-    if not input.IsStreaming() or not output.IsStreaming():
+    if not input.IsStreaming() or not output.IsStreaming() or break_:
         break

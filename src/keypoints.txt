@@ -1,0 +1,84 @@
+[<poseNet.ObjectPose.Keypoint object>
+   -- ID:  0 (palm)
+   -- x:   896.487
+   -- y:   460.567
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  1 (thumb_1)
+   -- x:   738.652
+   -- y:   229.655
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  2 (thumb_2)
+   -- x:   768.927
+   -- y:   287.657
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  3 (thumb_3)
+   -- x:   831.208
+   -- y:   353.115
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  4 (thumb_4)
+   -- x:   879.565
+   -- y:   417.423
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  5 (index_finger_1)
+   -- x:   558.476
+   -- y:   279.254
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  6 (index_finger_2)
+   -- x:   609.661
+   -- y:   296.949
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  7 (index_finger_3)
+   -- x:   665.98
+   -- y:   318.389
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  8 (index_finger_4)
+   -- x:   715.012
+   -- y:   352.528
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  9 (middle_finger_1)
+   -- x:   500.061
+   -- y:   351.287
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  10 (middle_finger_2)
+   -- x:   563.118
+   -- y:   354.977
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  11 (middle_finger_3)
+   -- x:   622.255
+   -- y:   367.07
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  12 (middle_finger_4)
+   -- x:   687.871
+   -- y:   390.027
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  13 (ring_finger_1)
+   -- x:   506.961
+   -- y:   432.394
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  14 (ring_finger_2)
+   -- x:   556.208
+   -- y:   430.083
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  15 (ring_finger_3)
+   -- x:   608.069
+   -- y:   432.292
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  16 (ring_finger_4)
+   -- x:   676.324
+   -- y:   430.052
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  17 (baby_finger_1)
+   -- x:   576.891
+   -- y:   535.497
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  18 (baby_finger_2)
+   -- x:   619.536
+   -- y:   515.703
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  19 (baby_finger_3)
+   -- x:   651.364
+   -- y:   498.099
+, <poseNet.ObjectPose.Keypoint object>
+   -- ID:  20 (baby_finger_4)
+   -- x:   699.148
+   -- y:   478.24
