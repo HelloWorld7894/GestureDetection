@@ -27,6 +27,7 @@ except:
 # create video sources & outputs
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
 output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
+        
 
 # process frames until the user exits
 while True:
