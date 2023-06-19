@@ -35,8 +35,6 @@ while True:
     # render the image
     output.Render(img)
 
-    # update the title bar
-    output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network))
     if keyboard.is_pressed("c"):
         jetson.utils.saveImageRGBA("img" + time.time() + ".jpg", img)
         print("saved an image!")
