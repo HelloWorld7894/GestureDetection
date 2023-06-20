@@ -137,12 +137,12 @@ rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
 paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
 scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
 reset_img = jetson.utils.loadImage('./source_imgs/Reset.png')
-win_img = jetson.utils.loadImage('./source_imgs/Win.png')
-lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
-tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
+#win_img = jetson.utils.loadImage('./source_imgs/Win.png')
+#lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
+#tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
 three_img = jetson.utils.loadImage('./source_imgs/Three.png')
-two_img = jetson.utils.loadImage('./source_imgs/Two.png')
-one_img = jetson.utils.loadImage('./source_imgs/One.png')
+#two_img = jetson.utils.loadImage('./source_imgs/Two.png')
+#one_img = jetson.utils.loadImage('./source_imgs/One.png')
 
 # process frames until the user exits
 while True:
