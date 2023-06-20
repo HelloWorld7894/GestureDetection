@@ -29,6 +29,7 @@ import sys
 import math
 import time
 import random
+import keyboard
 
 finished = False
 reset = False
@@ -185,10 +186,10 @@ while True:
           stroke = 0
           frame_index = 0
           oponnentGesture = GenerateRandomGesture()
-        if prev_Gesture != GetGesture():
+        if prev_Gesture != GetGesture() or prev_Gesture == 0:
           frame_index = 0
           prev_Gesture = GetGesture()
-        if stroke == 3 and frame_index > 0 and prev_Gesture == GetGesture():
+        if stroke == 3 and frame_index > 0 and prev_Gesture == GetGesture() and not prev_Gesture == 0:
           prev_Gesture = GetGesture()
           frame_index = frame_index+1
         if stroke == 3 and frame_index == 0:
@@ -196,11 +197,11 @@ while True:
           frame_index = 1
 
     if stroke == 0:
-      jetson.utils.cudaOverlay(three_img, img, img.width/2, img.height*0.1)
+      jetson.utils.cudaOverlay(three_img, img, img.width/2 - three_img.width/2, img.height*0.02)
     elif stroke == 1:
-      jetson.utils.cudaOverlay(two_img, img, img.width/2, img.height*0.1)
+      jetson.utils.cudaOverlay(two_img, img, img.width/2 - two_img.width/2, img.height*0.02)
     elif stroke == 2:
-      jetson.utils.cudaOverlay(one_img, img, img.width/2, img.height*0.1)
+      jetson.utils.cudaOverlay(one_img, img, img.width/2 - one_img.width/2, img.height*0.02)
 
     if finished:
       # overlay the current gesture image in front of the hand position
@@ -228,19 +229,19 @@ while True:
 
       #check for the result
       if oponnentGesture == 1 and prev_Gesture == 1:
-        print("TIE")
+        font.OverlayText(img, 5*img.width, 5*img.height, "TIE", int(img.width/2), int(img.height/2), (0, 0, 0))
         reset = True
       elif oponnentGesture == 1 and prev_Gesture == 2:
         print("YOU WIN")
         reset = True
       elif oponnentGesture == 1 and prev_Gesture == 3:
-        print("YOU LOSE")
+        font.OverlayText(img, 5*img.width, 5*img.height, "YOU LOSE", int(img.width/2), int(img.height/2), (0, 0, 0))
         reset = True
       elif oponnentGesture == 2 and prev_Gesture == 1:
-        print("YOU LOSE")
+        font.OverlayText(img, 5*img.width, 5*img.height, "YOU LOSE", int(img.width/2), int(img.height/2), (0, 0, 0))
         reset = True
       elif oponnentGesture == 2 and prev_Gesture == 2:
-        print("TIE")
+        font.OverlayText(img, 5*img.width, 5*img.height, "TIE", int(img.width/2), int(img.height/2), (0, 0, 0))
         reset = True
       elif oponnentGesture == 2 and prev_Gesture == 3:
         print("YOU WIN")
@@ -249,17 +250,20 @@ while True:
         print("YOU WIN")
         reset = True
       elif oponnentGesture == 3 and prev_Gesture == 2:
-        print("YOU LOSE")
+        font.OverlayText(img, img.width, img.height, "YOU LOSE", 50, 50, (0, 0, 0))
         reset = True
       elif oponnentGesture == 3 and prev_Gesture == 3:
-        print("TIE")
+        font.OverlayText(img, img.width, img.height, "TIE", 50, 50, (0, 0, 0))
         reset = True
 
     # render the image
     output.Render(img)
 
     PrintValues()
+    print(dir(jetson.utils.cudaFont))
 
+    if keyboard.is_pressed("q"):
+      jetson.utils.saveImageRGBA("./imgs/img" + str(time.time()) + ".jpg", img)
 
     # exit on input/output EOS and print the final gesture ID
     if not input.IsStreaming() or not output.IsStreaming():
