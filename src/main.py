@@ -141,7 +141,7 @@ net = jetson.inference.poseNet(opt.network, sys.argv, opt.threshold)
 
 # create video sources & outputs
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
-output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
+output = jetson.utils.videoOutput("output.mp4", argv=sys.argv)
 
 # load the input images
 error_img = jetson.utils.loadImage('./source_imgs/Error.png')
@@ -206,61 +206,61 @@ while True:
         if stroke == 3 and frame_index == 0 and not finished:
           prev_Geture = GetGesture()
           frame_index = 1
-#
-#    if stroke == 0:
-#      jetson.utils.cudaOverlay(three_img, img, img.width/2 - three_img.width/2, img.height*0.02)
-#    elif stroke == 1:
-#      jetson.utils.cudaOverlay(two_img, img, img.width/2 - two_img.width/2, img.height*0.02)
-#    elif stroke == 2:
-#      jetson.utils.cudaOverlay(one_img, img, img.width/2 - one_img.width/2, img.height*0.02)
-#
-#  
-#    if finished:
-#      # overlay the current gesture image in front of the hand position
-#      if prev_Gesture == 0:
-#        jetson.utils.cudaOverlay(error_img, img, palm_x - error_img.width/2, palm_y - error_img.height/2)
-#      elif prev_Gesture == 1:
-#        jetson.utils.cudaOverlay(rock_img, img, palm_x - rock_img.width/2, palm_y - rock_img.height/2)
-#      elif prev_Gesture == 2:
-#        jetson.utils.cudaOverlay(paper_img, img, palm_x - paper_img.width/2, palm_y - paper_img.height/2)
-#      elif prev_Gesture == 3:
-#        jetson.utils.cudaOverlay(scissors_img, img, palm_x - scissors_img.width/2, palm_y - scissors_img.height/2)
-#      elif prev_Gesture == 4:
-#        jetson.utils.cudaOverlay(reset_img, img, palm_x - reset_img.width/2, palm_y - reset_img.height/2)
-#        finished = False
-#        frame_index = 0
-#        stroke = 0
-#
-#       # overlay the oponents gesture image on the side of the frame
-#      if oponnentGesture == 1:
-#        jetson.utils.cudaOverlay(rock_img, img, img.width*0.1, img.height/2)
-#      elif oponnentGesture == 2:
-#        jetson.utils.cudaOverlay(paper_img, img, img.width*0.1, img.height/2)
-#      elif oponnentGesture == 3:
-#        jetson.utils.cudaOverlay(scissors_img, img, img.width*0.1, img.height/2)
-#
-#      #check for the result
-#      if oponnentGesture == 1 and prev_Gesture == 1:
-#        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
-#      elif oponnentGesture == 1 and prev_Gesture == 2:
-#        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
-#      elif oponnentGesture == 1 and prev_Gesture == 3:
-#        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
-#      elif oponnentGesture == 2 and prev_Gesture == 1:
-#        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
-#      elif oponnentGesture == 2 and prev_Gesture == 2:
-#        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
-#      elif oponnentGesture == 2 and prev_Gesture == 3:
-#        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
-#      elif oponnentGesture == 3 and prev_Gesture == 1:
-#        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
-#      elif oponnentGesture == 3 and prev_Gesture == 2:
-#        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
-#      elif oponnentGesture == 3 and prev_Gesture == 3:
-#        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
-#
-#      if WaitForReset():
-#        finished = False
+
+    if stroke == 0:
+      jetson.utils.cudaOverlay(three_img, img, img.width/2 - three_img.width/2, img.height*0.02)
+    elif stroke == 1:
+      jetson.utils.cudaOverlay(two_img, img, img.width/2 - two_img.width/2, img.height*0.02)
+    elif stroke == 2:
+      jetson.utils.cudaOverlay(one_img, img, img.width/2 - one_img.width/2, img.height*0.02)
+
+  
+    if finished:
+      # overlay the current gesture image in front of the hand position
+      if prev_Gesture == 0:
+        jetson.utils.cudaOverlay(error_img, img, palm_x - error_img.width/2, palm_y - error_img.height/2)
+      elif prev_Gesture == 1:
+        jetson.utils.cudaOverlay(rock_img, img, palm_x - rock_img.width/2, palm_y - rock_img.height/2)
+      elif prev_Gesture == 2:
+        jetson.utils.cudaOverlay(paper_img, img, palm_x - paper_img.width/2, palm_y - paper_img.height/2)
+      elif prev_Gesture == 3:
+        jetson.utils.cudaOverlay(scissors_img, img, palm_x - scissors_img.width/2, palm_y - scissors_img.height/2)
+      elif prev_Gesture == 4:
+        jetson.utils.cudaOverlay(reset_img, img, palm_x - reset_img.width/2, palm_y - reset_img.height/2)
+        finished = False
+        frame_index = 0
+        stroke = 0
+
+       # overlay the oponents gesture image on the side of the frame
+      if oponnentGesture == 1:
+        jetson.utils.cudaOverlay(rock_img, img, img.width*0.1, img.height/2)
+      elif oponnentGesture == 2:
+        jetson.utils.cudaOverlay(paper_img, img, img.width*0.1, img.height/2)
+      elif oponnentGesture == 3:
+        jetson.utils.cudaOverlay(scissors_img, img, img.width*0.1, img.height/2)
+
+      #check for the result
+      if oponnentGesture == 1 and prev_Gesture == 1:
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
+      elif oponnentGesture == 1 and prev_Gesture == 2:
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
+      elif oponnentGesture == 1 and prev_Gesture == 3:
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
+      elif oponnentGesture == 2 and prev_Gesture == 1:
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
+      elif oponnentGesture == 2 and prev_Gesture == 2:
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
+      elif oponnentGesture == 2 and prev_Gesture == 3:
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
+      elif oponnentGesture == 3 and prev_Gesture == 1:
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
+      elif oponnentGesture == 3 and prev_Gesture == 2:
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
+      elif oponnentGesture == 3 and prev_Gesture == 3:
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
+
+      if WaitForReset():
+        finished = False
 
     # render the image
     output.Render(img)
