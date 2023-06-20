@@ -121,14 +121,9 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 
 # load the input images
 #error_img = jetson.utils.loadImage('error.jpg')
-rock_img = jetson.utils.loadImage('./source_imgs/rock.jpg')
-#paper_img = jetson.utils.loadImage('paper.jpg')
-#scissors_img = jetson.utils.loadImage('scissors.jpg')
-
-img_ = input.Capture()
-
-# allocate the output image, with dimensions to fit both inputs side-by-side
-imgOutput = jetson.utils.cudaAllocMapped(width=img_.width, height=img_.height, format=img_.format)
+rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
+paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
+scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
 
 # process frames until the user exits
 while True:
