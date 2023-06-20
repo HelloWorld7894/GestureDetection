@@ -31,6 +31,7 @@ import time
 import random
 
 finished = False
+reset = False
 
 frame_index = 0
 
@@ -74,14 +75,14 @@ def GetGesture():
 
   if len(poses) == 0:
     gesture = 0
+  elif thumb1_y > baby1_y:
+    gesture = 4
   elif baby_index_distance < 3*ref_distance:
     gesture = 1
   elif thumb_index_distance > 2*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance > 3*ref_distance:
     gesture = 2
   elif thumb_index_distance > 2*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance < 3*ref_distance:
     gesture = 3
-  elif thumb_index_distance < 3*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance < 3*ref_distance:
-    gesture = 4
   else:
     gesture = 0
 
@@ -101,6 +102,7 @@ def PrintValues():
   print("Gesture:", GetGesture())
   print("Stroke: ", stroke)
   print("Frame_index:", frame_index)
+  print("Oponent gesture: ", oponnentGesture)
   net.PrintProfilerTimes()
   output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network, net.GetNetworkFPS()))
 
@@ -134,6 +136,7 @@ error_img = jetson.utils.loadImage('./source_imgs/Error.png')
 rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
 paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
 scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
+reset_img = jetson.utils.loadImage('./source_imgs/Reset.png')
 
 # process frames until the user exits
 while True:
@@ -147,9 +150,9 @@ while True:
     #go through all of the poses and keypoints and save the required values
     for pose in poses:
         for keypoint in pose.Keypoints:
-            if keypoint.ID == 0 and keypoint.y < (img.height/2)-70 and handUp == False and not GetGesture() == 0 and stroke < 3:
+            if keypoint.ID == 0 and keypoint.y < (img.height/2)-30 and handUp == False and not GetGesture() == 0 and stroke < 3:
               handUp = True
-            if keypoint.ID == 0 and keypoint.y > (img.height/2)-40 and handUp == True and not GetGesture() == 0 and stroke < 3:
+            if keypoint.ID == 0 and keypoint.y > (img.height/2) and handUp == True and not GetGesture() == 0 and stroke < 3:
               handUp = False
               stroke = stroke+1
             if keypoint.ID == 0:
@@ -173,6 +176,7 @@ while True:
         if frame_index > 8:
           frame_index = 0
           finished = True
+          oponnentGesture = GenerateRandomGesture()
         if prev_Gesture != GetGesture():
           frame_index = 0
           prev_Gesture = GetGesture()
@@ -184,15 +188,58 @@ while True:
           frame_index = 1
 
 
-    # compost the two images (the last two arguments are x,y coordinates in the output image)
-    if prev_Gesture == 0 and finished == True:
-      jetson.utils.cudaOverlay(error_img, img, palm_x - error_img.width/2, palm_y - error_img.height/2)
-    elif prev_Gesture == 1 and finished == True:
-      jetson.utils.cudaOverlay(rock_img, img, palm_x - rock_img.width/2, palm_y - rock_img.height/2)
-    elif prev_Gesture == 2 and finished == True:
-      jetson.utils.cudaOverlay(paper_img, img, palm_x - paper_img.width/2, palm_y - paper_img.height/2)
-    elif prev_Gesture == 3 and finished == True:
-      jetson.utils.cudaOverlay(scissors_img, img, palm_x - scissors_img.width/2, palm_y - scissors_img.height/2)
+    if finished:
+      # overlay the current gesture image in front of the hand position
+      if prev_Gesture == 0:
+        jetson.utils.cudaOverlay(error_img, img, palm_x - error_img.width/2, palm_y - error_img.height/2)
+      elif prev_Gesture == 1:
+        jetson.utils.cudaOverlay(rock_img, img, palm_x - rock_img.width/2, palm_y - rock_img.height/2)
+      elif prev_Gesture == 2:
+        jetson.utils.cudaOverlay(paper_img, img, palm_x - paper_img.width/2, palm_y - paper_img.height/2)
+      elif prev_Gesture == 3:
+        jetson.utils.cudaOverlay(scissors_img, img, palm_x - scissors_img.width/2, palm_y - scissors_img.height/2)
+      elif prev_Gesture == 4:
+        jetson.utils.cudaOverlay(reset_img, img, palm_x - reset_img.width/2, palm_y - reset_img.height/2)
+        finished = False
+        frame_index = 0
+        stroke = 0
+
+       # overlay the oponents gesture image on the side of the frame
+      if oponnentGesture == 1:
+        jetson.utils.cudaOverlay(rock_img, img, 20, img.height/2)
+      elif oponnentGesture == 2:
+        jetson.utils.cudaOverlay(paper_img, img, 20, img.height/2)
+      elif oponnentGesture == 3:
+        jetson.utils.cudaOverlay(scissors_img, img, 20, img.height/2)
+
+      #check for the result
+      if oponnentGesture == 1 and prev_Gesture == 1:
+        print("TIE")
+        reset = True
+      elif oponnentGesture == 1 and prev_Gesture == 2:
+        print("YOU WIN")
+        reset = True
+      elif oponnentGesture == 1 and prev_Gesture == 3:
+        print("YOU LOSE")
+        reset = True
+      elif oponnentGesture == 2 and prev_Gesture == 1:
+        print("YOU LOSE")
+        reset = True
+      elif oponnentGesture == 2 and prev_Gesture == 2:
+        print("TIE")
+        reset = True
+      elif oponnentGesture == 2 and prev_Gesture == 3:
+        print("YOU WIN")
+        reset = True
+      elif oponnentGesture == 3 and prev_Gesture == 1:
+        print("YOU WIN")
+        reset = True
+      elif oponnentGesture == 3 and prev_Gesture == 2:
+        print("YOU LOSE")
+        reset = True
+      elif oponnentGesture == 3 and prev_Gesture == 3:
+        print("TIE")
+        reset = True
 
     # render the image
     output.Render(img)
