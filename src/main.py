@@ -141,8 +141,8 @@ reset_img = jetson.utils.loadImage('./source_imgs/Reset.png')
 #lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
 #tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
 three_img = jetson.utils.loadImage('./source_imgs/Three.png')
-#two_img = jetson.utils.loadImage('./source_imgs/Two.png')
-#one_img = jetson.utils.loadImage('./source_imgs/One.png')
+two_img = jetson.utils.loadImage('./source_imgs/Two.png')
+one_img = jetson.utils.loadImage('./source_imgs/One.png')
 
 # process frames until the user exits
 while True:
@@ -182,6 +182,8 @@ while True:
         if frame_index > 8:
           frame_index = 0
           finished = True
+          stroke = 0
+          frame_index = 0
           oponnentGesture = GenerateRandomGesture()
         if prev_Gesture != GetGesture():
           frame_index = 0
