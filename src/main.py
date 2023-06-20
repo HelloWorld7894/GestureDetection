@@ -33,6 +33,8 @@ finished = False
 
 frame_index = 0
 
+palm_x = 0
+palm_y = 0
 thumb1_x = 0
 thumb1_y = 0
 index1_x = 0
@@ -81,11 +83,16 @@ def GetGesture():
 
   return gesture
 
+#define a function to print debug values
 def PrintValues():
-  print(ref_distance)
-  print(thumb_index_distance)
-  print(baby_index_distance)
-  print(baby_thumb_distance)
+  print("detected {:d} objects in image".format(len(poses)))
+  print("Referance distance: ", ref_distance)
+  print("Thumb to index distance", thumb_index_distance)
+  print("Baby to index distance", baby_index_distance)
+  print("Baby to thumb distance", baby_thumb_distance)
+  print("Gesture:", GetGesture())
+  print("Stroke: ", stroke)
+  print("Frame_index:", frame_index)
 
 # parse the command line
 parser = argparse.ArgumentParser(description="Run pose estimation DNN on a video/image stream.", 
@@ -114,7 +121,7 @@ output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 
 # load the input images
 #error_img = jetson.utils.loadImage('error.jpg')
-rock_img = jetson.utils.loadImage('rock.jpg')
+rock_img = jetson.utils.loadImage('./source_imgs/rock.jpg')
 #paper_img = jetson.utils.loadImage('paper.jpg')
 #scissors_img = jetson.utils.loadImage('scissors.jpg')
 
@@ -131,10 +138,8 @@ while True:
     # perform pose estimation (with overlay)
     poses = net.Process(img, overlay=opt.overlay)
 
-    # print the pose results
-    print("detected {:d} objects in image".format(len(poses)))
 
-    #go through all of the poses and check save the required values
+    #go through all of the poses and keypoints and save the required values
     for pose in poses:
         for keypoint in pose.Keypoints:
             if keypoint.ID == 0 and keypoint.y < (img.height/2)-70 and handUp == False and not GetGesture() == 0 and stroke < 3:
@@ -142,6 +147,9 @@ while True:
             if keypoint.ID == 0 and keypoint.y > (img.height/2)-40 and handUp == True and not GetGesture() == 0 and stroke < 3:
               handUp = False
               stroke = stroke+1
+            if keypoint.ID == 0:
+              palm_x = keypoint.x
+              palm_y = keypoint.y
             if keypoint.ID == 1:
               thumb1_x = keypoint.x
               thumb1_y = keypoint.y
@@ -170,32 +178,29 @@ while True:
           prev_Geture = GetGesture()
           frame_index = 1
 
-    #print the debug values
-    print("Gesture:", GetGesture())
-    print("Stroke: ", stroke)
-    print("Frame_index:", frame_index)
 
     # compost the two images (the last two arguments are x,y coordinates in the output image)
     if prev_Gesture == 0 and finished == True:
-      jetson.utils.cudaOverlay(error_img, img, 0, 0)
+      jetson.utils.cudaOverlay(error_img, img, palm_x, palm_y)
     elif prev_Gesture == 1 and finished == True:
-      jetson.utils.cudaOverlay(rock_img, img, 0, 0)
+      jetson.utils.cudaOverlay(rock_img, img, palm_x, palm_y)
     elif prev_Gesture == 2 and finished == True:
-      jetson.utils.cudaOverlay(paper_img, img, 0, 0)
+      jetson.utils.cudaOverlay(paper_img, img, palm_x, palm_y)
     elif prev_Gesture == 3 and finished == True:
-      jetson.utils.cudaOverlay(scissors_img, img, 0, 0)
+      jetson.utils.cudaOverlay(scissors_img, img, palm_x, palm_y)
 
     # render the image
     output.Render(img)
 
     # update the title bar
-    output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network, net.GetNetworkFPS()))
+ #   output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network, net.GetNetworkFPS()))
 
     # print out performance info
-    net.PrintProfilerTimes()
+ #  net.PrintProfilerTimes()
+
 
     # exit on input/output EOS and print the final gesture ID
-    if not input.IsStreaming() or not output.IsStreaming() or finished:
+    if not input.IsStreaming() or not output.IsStreaming():
         print("Final Gesture:", prev_Gesture)
         jetson.utils.saveImageRGBA("./imgs/img" + str(time.time()) + ".jpg", img)
         print("saved an image!")
