@@ -1,0 +1,6 @@
+mediapipe
+opencv-python
+torch
+torchvision
+torchsummary
+jetson
