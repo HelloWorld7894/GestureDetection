@@ -27,6 +27,7 @@ import jetson.utils
 import argparse
 import sys
 import math
+import time
 
 break_ = False
 
@@ -121,9 +122,9 @@ while True:
 
     for pose in poses:
         for keypoint in pose.Keypoints:
-            if keypoint.ID == 0 and keypoint.y < (img.height/2)-50 and handUp == False and not GetGesture() == 0:
+            if keypoint.ID == 0 and keypoint.y < (img.height/2)-30 and handUp == False and not GetGesture() == 0 and stroke < 3:
               handUp = True
-            if keypoint.ID == 0 and keypoint.y > (img.height/2)+50 and handUp == True and not GetGesture() == 0:
+            if keypoint.ID == 0 and keypoint.y > (img.height/2)+30 and handUp == True and not GetGesture() == 0 and stroke < 3:
               handUp = False
               stroke = stroke+1
             if keypoint.ID == 1:
@@ -141,21 +142,23 @@ while True:
             if keypoint.ID == 17:
               baby1_x = keypoint.x
               baby1_y = keypoint.y
-        if stroke == 3:
-          print(GetGesture())
-          break_ = False
-        if stroke > 3:
-          stroke = 0
-    if frame_index < 25:
-      if prev_Gesture == GetGesture():
-        frame_index = frame_index+1
-        prev_Gesture = GetGesture()
-      else:
-        frame_index = 0
-    else:
-      print(prev_Gesture)
-      break_ = True
+        if frame_index > 3:
+          frame_index = 0
+          break_ = True
+        if prev_Gesture != GetGesture():
+          frame_index = 0
+          prev_Gesture = GetGesture()
+        if stroke == 3 and frame_index > 0 and prev_Gesture == GetGesture():
+          prev_Gesture = GetGesture()
+          frame_index = frame_index+1
+        if stroke == 3 and frame_index == 0:
+          prev_Geture = GetGesture()
+          frame_index = 1
 
+
+    print("Gesture:", GetGesture())
+    print("Stroke: ", stroke)
+    print("Frame_index:", frame_index)
     # render the image
     output.Render(img)
 
@@ -167,4 +170,7 @@ while True:
 
     # exit on input/output EOS
     if not input.IsStreaming() or not output.IsStreaming() or break_:
+        print("Final Gesture:", prev_Gesture)
+        jetson.utils.saveImageRGBA("img" + str(time.time()) + ".jpg", img)
+        print("saved an image!")
         break
