@@ -10,5 +10,5 @@ Předtrénované sítě:
 3. densenet121
 
 TODO:
-- [] refactor and typo fix
-- [] natrénovat neuronovou síť na detekci gest
+- [ ] refactor and typo fix
+- [ ] natrénovat neuronovou síť na detekci gest
