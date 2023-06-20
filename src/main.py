@@ -28,6 +28,7 @@ import argparse
 import sys
 import math
 import time
+import random
 
 finished = False
 
@@ -51,6 +52,7 @@ thumb_index_distance = 0
 baby_index_distance = 0
 baby_thumb_distance = 0
 
+oponnentGesture = 0
 prev_Gesture = 0
 stroke = 0
 handUp = False
@@ -63,7 +65,7 @@ def CalculateDistance(point1_x, point1_y, point2_x, point2_y):
 #define the function to calculate the gesture using the finger distances
 def GetGesture():
 
-  gesture = 0    #0-none  1-rock   2-paper   3-scrissors
+  gesture = 0    #0-none  1-rock   2-paper   3-scrissors   4-reset
 
   ref_distance = CalculateDistance(index3_x, index3_y, index4_x, index4_y)
   thumb_index_distance = CalculateDistance(thumb1_x, thumb1_y, index1_x, index1_y)
@@ -78,10 +80,16 @@ def GetGesture():
     gesture = 2
   elif thumb_index_distance > 2*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance < 3*ref_distance:
     gesture = 3
+  elif thumb_index_distance < 3*ref_distance and baby_index_distance > 3*ref_distance and baby_thumb_distance < 3*ref_distance:
+    gesture = 4
   else:
     gesture = 0
 
   return gesture
+
+#define a dunction to genratate the oponents gesture
+def GenerateRandomGesture():
+  return random.randint(1, 3)
 
 #define a function to print debug values
 def PrintValues():
@@ -93,6 +101,8 @@ def PrintValues():
   print("Gesture:", GetGesture())
   print("Stroke: ", stroke)
   print("Frame_index:", frame_index)
+  net.PrintProfilerTimes()
+  output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network, net.GetNetworkFPS()))
 
 # parse the command line
 parser = argparse.ArgumentParser(description="Run pose estimation DNN on a video/image stream.", 
@@ -120,7 +130,7 @@ input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
 output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 
 # load the input images
-#error_img = jetson.utils.loadImage('error.jpg')
+error_img = jetson.utils.loadImage('./source_imgs/Error.png')
 rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
 paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
 scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
@@ -176,22 +186,18 @@ while True:
 
     # compost the two images (the last two arguments are x,y coordinates in the output image)
     if prev_Gesture == 0 and finished == True:
-      jetson.utils.cudaOverlay(error_img, img, palm_x, palm_y)
+      jetson.utils.cudaOverlay(error_img, img, palm_x - error_img.width/2, palm_y - error_img.height/2)
     elif prev_Gesture == 1 and finished == True:
-      jetson.utils.cudaOverlay(rock_img, img, palm_x, palm_y)
+      jetson.utils.cudaOverlay(rock_img, img, palm_x - rock_img.width/2, palm_y - rock_img.height/2)
     elif prev_Gesture == 2 and finished == True:
-      jetson.utils.cudaOverlay(paper_img, img, palm_x, palm_y)
+      jetson.utils.cudaOverlay(paper_img, img, palm_x - paper_img.width/2, palm_y - paper_img.height/2)
     elif prev_Gesture == 3 and finished == True:
-      jetson.utils.cudaOverlay(scissors_img, img, palm_x, palm_y)
+      jetson.utils.cudaOverlay(scissors_img, img, palm_x - scissors_img.width/2, palm_y - scissors_img.height/2)
 
     # render the image
     output.Render(img)
 
-    # update the title bar
- #   output.SetStatus("{:s} | Network {:.0f} FPS".format(opt.network, net.GetNetworkFPS()))
-
-    # print out performance info
- #  net.PrintProfilerTimes()
+    PrintValues()
 
 
     # exit on input/output EOS and print the final gesture ID
