@@ -29,7 +29,7 @@ import sys
 import math
 import time
 
-break_ = False
+finished = False
 
 frame_index = 0
 
@@ -53,9 +53,12 @@ prev_Gesture = 0
 stroke = 0
 handUp = False
 
+
+#define the function to calculate the distance between two keypoints
 def CalculateDistance(point1_x, point1_y, point2_x, point2_y):
   return round(math.sqrt((abs(point1_x-point2_x)**2)+(abs(point1_y-point2_y)**2)),2)
 
+#define the function to calculate the gesture using the finger distances
 def GetGesture():
 
   gesture = 0    #0-none  1-rock   2-paper   3-scrissors
@@ -109,6 +112,17 @@ net = jetson.inference.poseNet(opt.network, sys.argv, opt.threshold)
 input = jetson.utils.videoSource(opt.input_URI, argv=sys.argv)
 output = jetson.utils.videoOutput(opt.output_URI, argv=sys.argv)
 
+# load the input images
+#error_img = jetson.utils.loadImage('error.jpg')
+rock_img = jetson.utils.loadImage('rock.jpg')
+#paper_img = jetson.utils.loadImage('paper.jpg')
+#scissors_img = jetson.utils.loadImage('scissors.jpg')
+
+img_ = input.Capture()
+
+# allocate the output image, with dimensions to fit both inputs side-by-side
+imgOutput = jetson.utils.cudaAllocMapped(width=img_.width, height=img_.height, format=img_.format)
+
 # process frames until the user exits
 while True:
     # capture the next image
@@ -120,11 +134,12 @@ while True:
     # print the pose results
     print("detected {:d} objects in image".format(len(poses)))
 
+    #go through all of the poses and check save the required values
     for pose in poses:
         for keypoint in pose.Keypoints:
-            if keypoint.ID == 0 and keypoint.y < (img.height/2)-30 and handUp == False and not GetGesture() == 0 and stroke < 3:
+            if keypoint.ID == 0 and keypoint.y < (img.height/2)-70 and handUp == False and not GetGesture() == 0 and stroke < 3:
               handUp = True
-            if keypoint.ID == 0 and keypoint.y > (img.height/2)+30 and handUp == True and not GetGesture() == 0 and stroke < 3:
+            if keypoint.ID == 0 and keypoint.y > (img.height/2)-40 and handUp == True and not GetGesture() == 0 and stroke < 3:
               handUp = False
               stroke = stroke+1
             if keypoint.ID == 1:
@@ -142,9 +157,9 @@ while True:
             if keypoint.ID == 17:
               baby1_x = keypoint.x
               baby1_y = keypoint.y
-        if frame_index > 3:
+        if frame_index > 8:
           frame_index = 0
-          break_ = True
+          finished = True
         if prev_Gesture != GetGesture():
           frame_index = 0
           prev_Gesture = GetGesture()
@@ -155,10 +170,21 @@ while True:
           prev_Geture = GetGesture()
           frame_index = 1
 
-
+    #print the debug values
     print("Gesture:", GetGesture())
     print("Stroke: ", stroke)
     print("Frame_index:", frame_index)
+
+    # compost the two images (the last two arguments are x,y coordinates in the output image)
+    if prev_Gesture == 0 and finished == True:
+      jetson.utils.cudaOverlay(error_img, img, 0, 0)
+    elif prev_Gesture == 1 and finished == True:
+      jetson.utils.cudaOverlay(rock_img, img, 0, 0)
+    elif prev_Gesture == 2 and finished == True:
+      jetson.utils.cudaOverlay(paper_img, img, 0, 0)
+    elif prev_Gesture == 3 and finished == True:
+      jetson.utils.cudaOverlay(scissors_img, img, 0, 0)
+
     # render the image
     output.Render(img)
 
@@ -168,9 +194,10 @@ while True:
     # print out performance info
     net.PrintProfilerTimes()
 
-    # exit on input/output EOS
-    if not input.IsStreaming() or not output.IsStreaming() or break_:
+    # exit on input/output EOS and print the final gesture ID
+    if not input.IsStreaming() or not output.IsStreaming() or finished:
         print("Final Gesture:", prev_Gesture)
-        jetson.utils.saveImageRGBA("img" + str(time.time()) + ".jpg", img)
+        jetson.utils.saveImageRGBA("./imgs/img" + str(time.time()) + ".jpg", img)
         print("saved an image!")
+        time.sleep(4)
         break
