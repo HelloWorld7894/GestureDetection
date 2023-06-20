@@ -137,6 +137,12 @@ rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
 paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
 scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
 reset_img = jetson.utils.loadImage('./source_imgs/Reset.png')
+win_img = jetson.utils.loadImage('./source_imgs/Win.png')
+lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
+tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
+three_img = jetson.utils.loadImage('./source_imgs/Three.png')
+two_img = jetson.utils.loadImage('./source_imgs/Two.png')
+one_img = jetson.utils.loadImage('./source_imgs/One.png')
 
 # process frames until the user exits
 while True:
@@ -187,6 +193,12 @@ while True:
           prev_Geture = GetGesture()
           frame_index = 1
 
+    if stroke == 0:
+      jetson.utils.cudaOverlay(three_img, img, img.width/2, img.height*0.1)
+    elif stroke == 1:
+      jetson.utils.cudaOverlay(two_img, img, img.width/2, img.height*0.1)
+    elif stroke == 2:
+      jetson.utils.cudaOverlay(one_img, img, img.width/2, img.height*0.1)
 
     if finished:
       # overlay the current gesture image in front of the hand position
@@ -206,11 +218,11 @@ while True:
 
        # overlay the oponents gesture image on the side of the frame
       if oponnentGesture == 1:
-        jetson.utils.cudaOverlay(rock_img, img, 20, img.height/2)
+        jetson.utils.cudaOverlay(rock_img, img, img.width*0.1, img.height/2)
       elif oponnentGesture == 2:
-        jetson.utils.cudaOverlay(paper_img, img, 20, img.height/2)
+        jetson.utils.cudaOverlay(paper_img, img, img.width*0.1, img.height/2)
       elif oponnentGesture == 3:
-        jetson.utils.cudaOverlay(scissors_img, img, 20, img.height/2)
+        jetson.utils.cudaOverlay(scissors_img, img, img.width*0.1, img.height/2)
 
       #check for the result
       if oponnentGesture == 1 and prev_Gesture == 1:
