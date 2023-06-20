@@ -32,7 +32,6 @@ import random
 import keyboard
 
 finished = False
-reset = False
 
 frame_index = 0
 
@@ -89,6 +88,18 @@ def GetGesture():
 
   return gesture
 
+#define a funtion that chacks if the reset gesture is shown
+def WaitForReset():
+
+  reset = False
+
+  if thumb1_y > baby1_y:
+    reset_ = True
+  else:
+    reset_ = False
+
+  return reset_
+
 #define a dunction to genratate the oponents gesture
 def GenerateRandomGesture():
   return random.randint(1, 3)
@@ -138,9 +149,9 @@ rock_img = jetson.utils.loadImage('./source_imgs/Rock.png')
 paper_img = jetson.utils.loadImage('./source_imgs/Paper.png')
 scissors_img = jetson.utils.loadImage('./source_imgs/Scissors.png')
 reset_img = jetson.utils.loadImage('./source_imgs/Reset.png')
-#win_img = jetson.utils.loadImage('./source_imgs/Win.png')
-#lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
-#tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
+win_img = jetson.utils.loadImage('./source_imgs/Win.png')
+lose_img = jetson.utils.loadImage('./source_imgs/Lose.png')
+tie_img = jetson.utils.loadImage('./source_imgs/Tie.png')
 three_img = jetson.utils.loadImage('./source_imgs/Three.png')
 two_img = jetson.utils.loadImage('./source_imgs/Two.png')
 one_img = jetson.utils.loadImage('./source_imgs/One.png')
@@ -180,19 +191,19 @@ while True:
             if keypoint.ID == 17:
               baby1_x = keypoint.x
               baby1_y = keypoint.y
-        if frame_index > 8:
+        if frame_index > 8 and not finished:
           frame_index = 0
           finished = True
           stroke = 0
           frame_index = 0
           oponnentGesture = GenerateRandomGesture()
-        if prev_Gesture != GetGesture() or prev_Gesture == 0:
+        if (prev_Gesture != GetGesture() or prev_Gesture == 0) and not finished:
           frame_index = 0
           prev_Gesture = GetGesture()
-        if stroke == 3 and frame_index > 0 and prev_Gesture == GetGesture() and not prev_Gesture == 0:
+        if stroke == 3 and frame_index > 0 and prev_Gesture == GetGesture() and not prev_Gesture == 0 and not finished:
           prev_Gesture = GetGesture()
           frame_index = frame_index+1
-        if stroke == 3 and frame_index == 0:
+        if stroke == 3 and frame_index == 0 and not finished:
           prev_Geture = GetGesture()
           frame_index = 1
 
@@ -229,38 +240,29 @@ while True:
 
       #check for the result
       if oponnentGesture == 1 and prev_Gesture == 1:
-        font.OverlayText(img, 5*img.width, 5*img.height, "TIE", int(img.width/2), int(img.height/2), (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
       elif oponnentGesture == 1 and prev_Gesture == 2:
-        print("YOU WIN")
-        reset = True
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
       elif oponnentGesture == 1 and prev_Gesture == 3:
-        font.OverlayText(img, 5*img.width, 5*img.height, "YOU LOSE", int(img.width/2), int(img.height/2), (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
       elif oponnentGesture == 2 and prev_Gesture == 1:
-        font.OverlayText(img, 5*img.width, 5*img.height, "YOU LOSE", int(img.width/2), int(img.height/2), (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
       elif oponnentGesture == 2 and prev_Gesture == 2:
-        font.OverlayText(img, 5*img.width, 5*img.height, "TIE", int(img.width/2), int(img.height/2), (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
       elif oponnentGesture == 2 and prev_Gesture == 3:
-        print("YOU WIN")
-        reset = True
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
       elif oponnentGesture == 3 and prev_Gesture == 1:
-        print("YOU WIN")
-        reset = True
+        jetson.utils.cudaOverlay(win_img, img, img.width/2 - win_img.width/2, img.height/2 - win_img.height/2)
       elif oponnentGesture == 3 and prev_Gesture == 2:
-        font.OverlayText(img, img.width, img.height, "YOU LOSE", 50, 50, (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(lose_img, img, img.width/2 - lose_img.width/2, img.height/2 - lose_img.height/2)
       elif oponnentGesture == 3 and prev_Gesture == 3:
-        font.OverlayText(img, img.width, img.height, "TIE", 50, 50, (0, 0, 0))
-        reset = True
+        jetson.utils.cudaOverlay(tie_img, img, img.width/2 - tie_img.width/2, img.height/2 - tie_img.height/2)
+
+      if WaitForReset():
+        finished = False
 
     # render the image
     output.Render(img)
-
-    PrintValues()
-    print(dir(jetson.utils.cudaFont))
 
     if keyboard.is_pressed("q"):
       jetson.utils.saveImageRGBA("./imgs/img" + str(time.time()) + ".jpg", img)
