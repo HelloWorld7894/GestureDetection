@@ -12,3 +12,4 @@ Předtrénované sítě:
 TODO:
 - [ ] refactor and typo fix
 - [ ] natrénovat neuronovou síť na detekci gest
+- [ ] migrovat na pc (použití mediapipe backbone)
