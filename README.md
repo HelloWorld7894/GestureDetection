@@ -21,6 +21,7 @@ odkaz na příspěvek do sborníku &#8594; [https://github.com/HelloWorld7894/Ge
 ---
 
 ## TODO:
+- [x] docs update
 - [ ] refactor and typo fix
 - [ ] natrénovat neuronovou síť na detekci gest
 - [ ] migrovat na pc (použití mediapipe backbone)
