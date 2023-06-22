@@ -13,6 +13,11 @@ Předtrénované sítě:
 
 https://github.com/HelloWorld7894/GestureDetection/assets/59885570/89d24546-08a4-4a1d-8a52-ba32e7dc3506
 
+## Odkazy:
+
+odkaz na prezentaci &#8594; [https://github.com/HelloWorld7894/GestureDetection/blob/main/docs/presentation.pdf](https://github.com/HelloWorld7894/GestureDetection/blob/main/docs/presentation.pdf)\
+odkaz na příspěvek do sborníku &#8594; [https://github.com/HelloWorld7894/GestureDetection/blob/main/docs/paper.pdf](https://github.com/HelloWorld7894/GestureDetection/blob/main/docs/paper.pdf)
+
 ---
 
 ## TODO:
