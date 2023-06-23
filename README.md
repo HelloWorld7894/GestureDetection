@@ -9,6 +9,9 @@ Předtrénované sítě:
 2. resnet18-body
 3. densenet121
 
+## Schéma bodů na ruce
+![hand_landmarks](https://github.com/HelloWorld7894/GestureDetection/blob/main/docs/hand_labels.png)
+
 ## Demo:
 
 https://github.com/HelloWorld7894/GestureDetection/assets/59885570/89d24546-08a4-4a1d-8a52-ba32e7dc3506
